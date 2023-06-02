@@ -12,7 +12,7 @@ import (
 )
 
 type Database struct {
-	session *gorm.DB
+	Session *gorm.DB
 }
 
 var DB Database
@@ -34,6 +34,6 @@ func Connect() {
 	db.AutoMigrate(&models.User{})
 
 	DB = Database{
-		session: db,
+		Session: db,
 	}
 }
