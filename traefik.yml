@@ -1,0 +1,19 @@
+# traefik.yml
+api:
+  dashboard: true
+
+entryPoints:
+  web:
+    address: ":80"
+
+http:
+  routers:
+    router-backend:
+      rule: "Host(`${BACKEND_HOST}`) && PathPrefix(`/`)"
+      service: "service-backend"
+
+  services:
+    service-backend:
+      loadBalancer:
+        servers:
+          - url: "http://${BACKEND_LOCALHOST}:8000"

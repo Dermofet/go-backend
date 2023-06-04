@@ -24,13 +24,12 @@ func init() {
 type config struct {
 	BACKEND_HOST string
 	BACKEND_PORT int
-
-	DB_HOST     string
-	DB_PORT     int
-	DB_USERNAME string
-	DB_PASSWORD string
-	DB_NAME     string
-	DB_DSN      string
+	DB_HOST      string
+	DB_PORT      int
+	DB_USERNAME  string
+	DB_PASSWORD  string
+	DB_NAME      string
+	DB_DSN       string
 }
 
 func loadConfig() (*config, error) {

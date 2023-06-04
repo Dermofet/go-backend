@@ -13,6 +13,24 @@ type UserService struct {
 	Facade facade.DBFacade
 }
 
+type CreateRequestBody struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+	Email    string `json:"email"`
+}
+
+// CreateUser create user.
+// @Summary Create user
+// @Description Create user.
+// @ID create-user
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param body body CreateRequestBody true "Request body"
+// @Success 201 {object} map[string]interface{}
+// @Failure 408 {object} map[string]interface{}
+// @Failure 409 {object} map[string]interface{}
+// @Router /api/user/ [post]
 func (s *UserService) CreateUser(c *fiber.Ctx) error {
 	user := new(models.User)
 
@@ -31,6 +49,18 @@ func (s *UserService) CreateUser(c *fiber.Ctx) error {
 	return c.Status(201).JSON(fiber.Map{"status": "success", "message": "User has created", "data": user})
 }
 
+// GetUserByEmail gets a user by Email.
+// @Summary Get user by Email
+// @Description Get a user by their Email.
+// @ID get-user-by-email
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param email path string true "User Email"
+// @Success 200 {object} map[string]interface{}
+// @Failure 404 {object} map[string]interface{}
+// @Failure 409 {object} map[string]interface{}
+// @Router /api/user/{email} [get]
 func (s *UserService) GetUserByEmail(c *fiber.Ctx) error {
 	email := c.Params("email")
 
@@ -47,6 +77,17 @@ func (s *UserService) GetUserByEmail(c *fiber.Ctx) error {
 	return c.Status(200).JSON(fiber.Map{"status": "success", "message": "User has found", "data": user})
 }
 
+// GetUserByID gets a user by ID.
+// @Summary Get user by ID
+// @Description Get a user by their ID.
+// @ID get-user-by-id
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param id path int true "User ID"
+// @Success 200 {object} map[string]interface{}
+// @Failure 404 {object} map[string]interface{}
+// @Router /api/user/{id} [get]
 func (s *UserService) GetUserByID(c *fiber.Ctx) error {
 	id, err := uuid.Parse(c.Params("id"))
 	if err != nil {
@@ -67,6 +108,18 @@ func (s *UserService) GetUserByID(c *fiber.Ctx) error {
 	return c.Status(200).JSON(fiber.Map{"status": "success", "message": "User has found", "data": user})
 }
 
+// UpdateUser update user.
+// @Summary Update user
+// @Description Update user.
+// @ID update-user
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param id path int true "User ID"
+// @Success 200 {object} map[string]interface{}
+// @Failure 404 {object} map[string]interface{}
+// @Failure 409 {object} map[string]interface{}
+// @Router /api/user/{id} [put]
 func (s *UserService) UpdateUser(c *fiber.Ctx) error {
 	id, err := uuid.Parse(c.Params("id"))
 	if err != nil {
@@ -95,6 +148,17 @@ func (s *UserService) UpdateUser(c *fiber.Ctx) error {
 	return c.Status(200).JSON(fiber.Map{"status": "success", "message": "User has updated", "data": user})
 }
 
+// DeleteUser delete user.
+// @Summary Delete user
+// @Description Delete user.
+// @ID delete-user
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param id path int true "User ID"
+// @Success 200 {object} map[string]interface{}
+// @Failure 409 {object} map[string]interface{}
+// @Router /api/user/{id} [delete]
 func (s *UserService) DeleteUser(c *fiber.Ctx) error {
 	id, err := uuid.Parse(c.Params("id"))
 	if err != nil {

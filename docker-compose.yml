@@ -1,0 +1,64 @@
+version: '3.9'
+services:
+  db:
+    image: postgres:15
+    container_name: db
+    volumes:
+      - app-db-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5432:5432"
+    networks:
+      - default
+    healthcheck:
+      test: [ 'CMD-SHELL', 'pg_isready -U postgres' ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+  
+  backend:
+    container_name: backend
+    build:
+      context: .
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - .:/app
+    environment:
+      BACKEND_HOST: ${BACKEND_HOST}
+      BACKEND_PORT: ${BACKEND_PORT}
+    ports:
+      - 8000:${BACKEND_PORT}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.router-backend.rule=Host(`${BACKEND_LOCALHOST}`)"
+    networks:
+      - default
+
+  traefik:
+    image: traefik:v2.4
+    container_name: traefik
+    ports:
+      - "80:80"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "./traefik.yml:/etc/traefik/traefik.yml"
+    networks:
+      - default
+
+  # swagger-ui:
+  #   image: swaggerapi/swagger-ui
+  #   volumes:
+  #       - ./api/swagger/swagger.json:/usr/share/nginx/html/docs/doc.json
+  #   networks:
+  #     - default
+
+networks:
+  default:
+
+volumes:
+  app-db-data:

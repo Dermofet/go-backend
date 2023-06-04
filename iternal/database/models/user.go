@@ -10,6 +10,7 @@ type User struct {
 	ID       uuid.UUID `gorm:"type:uuid;"`
 	Username string    `json:"username"`
 	Password string    `json:"password"`
+	Email    string    `json:"email"`
 }
 
 func (user *User) BeforeCreate(tx *gorm.DB) (err error) {
