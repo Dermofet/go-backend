@@ -3,50 +3,17 @@ package services
 import (
 	facade "go-backend/iternal/database/facade"
 	"go-backend/iternal/database/models"
+	_ "go-backend/iternal/schemas"
 	"log"
+	"net/url"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
+	"github.com/sirupsen/logrus"
 )
 
 type UserService struct {
-	Facade facade.DBFacade
-}
-
-type CreateRequestBody struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-	Email    string `json:"email"`
-}
-
-// CreateUser create user.
-// @Summary Create user
-// @Description Create user.
-// @ID create-user
-// @Tags users
-// @Accept json
-// @Produce json
-// @Param body body CreateRequestBody true "Request body"
-// @Success 201 {object} map[string]interface{}
-// @Failure 408 {object} map[string]interface{}
-// @Failure 409 {object} map[string]interface{}
-// @Router /api/user/ [post]
-func (s *UserService) CreateUser(c *fiber.Ctx) error {
-	user := new(models.User)
-
-	err := c.BodyParser(user)
-	if err != nil {
-		log.Print("UserService.CreateUser wrong input")
-		return c.Status(409).JSON(fiber.Map{"status": "error", "message": "Could not create user", "data": err})
-	}
-
-	err = s.Facade.CreateUser(user)
-	if err != nil {
-		log.Print("UserService.CreateUser error: ", err)
-		return c.Status(409).JSON(fiber.Map{"status": "error", "message": "Could not create user", "data": err})
-	}
-
-	return c.Status(201).JSON(fiber.Map{"status": "success", "message": "User has created", "data": user})
+	Facade facade.DBFacadeInterface
 }
 
 // GetUserByEmail gets a user by Email.
@@ -60,21 +27,27 @@ func (s *UserService) CreateUser(c *fiber.Ctx) error {
 // @Success 200 {object} map[string]interface{}
 // @Failure 404 {object} map[string]interface{}
 // @Failure 409 {object} map[string]interface{}
-// @Router /api/user/{email} [get]
+// @Router /user/email/{email} [get]
+// @Security JWT
 func (s *UserService) GetUserByEmail(c *fiber.Ctx) error {
-	email := c.Params("email")
+	email, err := url.QueryUnescape(c.Params("email"))
+	if err != nil {
+		logrus.WithError(err).Print("Bad unescape query")
+
+	}
 
 	user, err := s.Facade.GetUserByEmail(email)
 	if err != nil {
-		log.Print("UserService.GetUserByEmail error: ", err)
-		return c.Status(409).JSON(fiber.Map{"status": "error", "message": "Could not find user", "data": err})
+		logrus.WithError(err).Print("Could not find user")
+		return c.Status(fiber.StatusConflict).JSON(fiber.Map{"status": "error", "message": "Could not find user", "data": err})
 	}
 
 	if user.ID == uuid.Nil {
-		return c.Status(404).JSON(fiber.Map{"status": "error", "message": "User not found", "data": nil})
+		logrus.WithError(err).Print("User not found")
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"status": "ok", "message": "User not found", "data": nil})
 	}
 
-	return c.Status(200).JSON(fiber.Map{"status": "success", "message": "User has found", "data": user})
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"status": "success", "message": "User has found", "data": user})
 }
 
 // GetUserByID gets a user by ID.
@@ -87,7 +60,8 @@ func (s *UserService) GetUserByEmail(c *fiber.Ctx) error {
 // @Param id path int true "User ID"
 // @Success 200 {object} map[string]interface{}
 // @Failure 404 {object} map[string]interface{}
-// @Router /api/user/{id} [get]
+// @Router /user/id/{id} [get]
+// @Security JWT
 func (s *UserService) GetUserByID(c *fiber.Ctx) error {
 	id, err := uuid.Parse(c.Params("id"))
 	if err != nil {
@@ -119,7 +93,8 @@ func (s *UserService) GetUserByID(c *fiber.Ctx) error {
 // @Success 200 {object} map[string]interface{}
 // @Failure 404 {object} map[string]interface{}
 // @Failure 409 {object} map[string]interface{}
-// @Router /api/user/{id} [put]
+// @Router /user/id/{id} [put]
+// @Security JWT
 func (s *UserService) UpdateUser(c *fiber.Ctx) error {
 	id, err := uuid.Parse(c.Params("id"))
 	if err != nil {
@@ -158,7 +133,8 @@ func (s *UserService) UpdateUser(c *fiber.Ctx) error {
 // @Param id path int true "User ID"
 // @Success 200 {object} map[string]interface{}
 // @Failure 409 {object} map[string]interface{}
-// @Router /api/user/{id} [delete]
+// @Router /user/id/{id} [delete]
+// @Security JWT
 func (s *UserService) DeleteUser(c *fiber.Ctx) error {
 	id, err := uuid.Parse(c.Params("id"))
 	if err != nil {

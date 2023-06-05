@@ -49,9 +49,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/user/": {
+        "/auth/login": {
             "post": {
-                "description": "Create user.",
+                "description": "Sign in user",
                 "consumes": [
                     "application/json"
                 ],
@@ -59,10 +59,10 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "users"
+                    "auth"
                 ],
-                "summary": "Create user",
-                "operationId": "create-user",
+                "summary": "Sign in user",
+                "operationId": "sign-in",
                 "parameters": [
                     {
                         "description": "Request body",
@@ -70,7 +70,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/services.CreateRequestBody"
+                            "$ref": "#/definitions/schemas.UserSignIn"
                         }
                     }
                 ],
@@ -78,12 +78,47 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
+                            "$ref": "#/definitions/schemas.AccessToken"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
                             "type": "object",
                             "additionalProperties": true
                         }
-                    },
-                    "408": {
-                        "description": "Request Timeout",
+                    }
+                }
+            }
+        },
+        "/auth/signup": {
+            "post": {
+                "description": "Sign up user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Sign up user",
+                "operationId": "sign-up",
+                "parameters": [
+                    {
+                        "description": "Request body",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schemas.UserSignUp"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -99,8 +134,13 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/user/{email}": {
+        "/user/email/{email}": {
             "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
                 "description": "Get a user by their Email.",
                 "consumes": [
                     "application/json"
@@ -147,8 +187,13 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/user/{id}": {
+        "/user/id/{id}": {
             "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
                 "description": "Get a user by their ID.",
                 "consumes": [
                     "application/json"
@@ -188,6 +233,11 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
                 "description": "Update user.",
                 "consumes": [
                     "application/json"
@@ -234,6 +284,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
                 "description": "Delete user.",
                 "consumes": [
                     "application/json"
@@ -275,7 +330,26 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "services.CreateRequestBody": {
+        "schemas.AccessToken": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string"
+                }
+            }
+        },
+        "schemas.UserSignIn": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "schemas.UserSignUp": {
             "type": "object",
             "properties": {
                 "email": {
@@ -288,6 +362,13 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "JWT": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }`

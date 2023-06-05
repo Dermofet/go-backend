@@ -4,6 +4,8 @@ import (
 	"go-backend/iternal/database"
 	"go-backend/iternal/router"
 
+	_ "go-backend/docs"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
@@ -24,18 +26,22 @@ import (
 
 // @BasePath /
 // @schemes http
+
+// @securityDefinitions.apikey JWT
+// @in header
+// @name Authorization
 func main() {
 	database.Connect()
-
 	app := fiber.New()
 
 	app.Use(logger.New())
-	app.Use(cors.New(cors.Config{
-		AllowOrigins:     "*",
-		AllowHeaders:     "Origin, Content-Type, Accept",
-		AllowMethods:     "GET, POST, PUT, DELETE, OPTIONS",
-		AllowCredentials: false,
-	}))
+	// app.Use(cors.New(cors.Config{
+	// 	AllowOrigins:     "*",
+	// 	AllowHeaders:     "Origin, Content-Type, Accept",
+	// 	AllowMethods:     "GET, POST, PUT, DELETE, OPTIONS",
+	// 	AllowCredentials: false,
+	// }))
+	app.Use(cors.New())
 	app.Use(recover.New())
 
 	router.SetupRoutes(app)

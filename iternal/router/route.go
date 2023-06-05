@@ -4,23 +4,25 @@ import (
 	"fmt"
 	_ "go-backend/docs"
 	"go-backend/iternal/config"
+	"go-backend/iternal/database"
 	"go-backend/iternal/database/dao"
-	database "go-backend/iternal/database/facade"
+	facade "go-backend/iternal/database/facade"
+	"go-backend/iternal/middleware"
 	"go-backend/iternal/services"
+	auth "go-backend/iternal/services/auth"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/swagger"
 )
 
-// SetupRoutes func
 func SetupRoutes(app *fiber.App) {
-	// grouping
-	api := app.Group("/api")
-	v1 := api.Group("/user")
-	// routes
+	userGroup := app.Group("/user")
+	authGroup := app.Group("/auth")
+
+	userGroup.Use(middleware.AuthUser)
+
 	app.Get("/", services.HealthCheck)
 
-	// swaggerConfig := "./docs/swagger.json"
 	app.Get("/docs/*", swagger.New(swagger.Config{
 		URL: fmt.Sprintf("http://%s:%d/swagger", config.Config.BACKEND_HOST, config.Config.BACKEND_PORT),
 	}))
@@ -29,10 +31,17 @@ func SetupRoutes(app *fiber.App) {
 		return c.SendFile("./docs/swagger.json")
 	})
 
-	userService := services.UserService{Facade: database.DBFacade{UserDao: &dao.UserDAO{}}}
-	v1.Post("/", userService.CreateUser)
-	v1.Get("/{email}", userService.GetUserByEmail)
-	v1.Get("/{id}", userService.GetUserByID)
-	v1.Put("/{id}", userService.UpdateUser)
-	v1.Delete("/{id}", userService.DeleteUser)
+	facade := &facade.DBFacade{
+		UserDao: &dao.UserDAO{DB: database.DB},
+	}
+
+	userService := services.UserService{Facade: facade}
+	userGroup.Get("/email/:email", userService.GetUserByEmail)
+	userGroup.Get("/id/:id", userService.GetUserByID)
+	userGroup.Put("/id/:id", userService.UpdateUser)
+	userGroup.Delete("/id/:id", userService.DeleteUser)
+
+	authService := auth.AuthService{Facade: facade}
+	authGroup.Post("/signup", authService.SignUp)
+	authGroup.Post("/login", authService.SignIn)
 }

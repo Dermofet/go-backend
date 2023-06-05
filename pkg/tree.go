@@ -1,22 +1,11 @@
-package main
+package pkg
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/ahmetb/go-linq"
 	"github.com/xlab/treeprint"
 )
-
-func main() {
-	root := treeprint.New()
-
-	// Добавление файлов и папок к дереву
-	addDirToTree(".", root)
-
-	// Вывод дерева в терминал
-	fmt.Println(root.String())
-}
 
 func addDirToTree(path string, node treeprint.Tree) {
 	file, err := os.Open(path)

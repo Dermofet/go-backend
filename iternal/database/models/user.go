@@ -8,13 +8,12 @@ import (
 type User struct {
 	gorm.Model
 	ID       uuid.UUID `gorm:"type:uuid;"`
-	Username string    `json:"username"`
-	Password string    `json:"password"`
-	Email    string    `json:"email"`
+	Username string
+	Password string
+	Email    string
 }
 
 func (user *User) BeforeCreate(tx *gorm.DB) (err error) {
-	// UUID version 4
 	user.ID = uuid.New()
 	return
 }

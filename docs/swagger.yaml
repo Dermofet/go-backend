@@ -1,6 +1,18 @@
 basePath: /
 definitions:
-  services.CreateRequestBody:
+  schemas.AccessToken:
+    properties:
+      access_token:
+        type: string
+    type: object
+  schemas.UserSignIn:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  schemas.UserSignUp:
     properties:
       email:
         type: string
@@ -38,19 +50,47 @@ paths:
       summary: Show the status of server.
       tags:
       - root
-  /api/user/:
+  /auth/login:
     post:
       consumes:
       - application/json
-      description: Create user.
-      operationId: create-user
+      description: Sign in user
+      operationId: sign-in
       parameters:
       - description: Request body
         in: body
         name: body
         required: true
         schema:
-          $ref: '#/definitions/services.CreateRequestBody'
+          $ref: '#/definitions/schemas.UserSignIn'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/schemas.AccessToken'
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Sign in user
+      tags:
+      - auth
+  /auth/signup:
+    post:
+      consumes:
+      - application/json
+      description: Sign up user
+      operationId: sign-up
+      parameters:
+      - description: Request body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.UserSignUp'
       produces:
       - application/json
       responses:
@@ -59,20 +99,15 @@ paths:
           schema:
             additionalProperties: true
             type: object
-        "408":
-          description: Request Timeout
-          schema:
-            additionalProperties: true
-            type: object
         "409":
           description: Conflict
           schema:
             additionalProperties: true
             type: object
-      summary: Create user
+      summary: Sign up user
       tags:
-      - users
-  /api/user/{email}:
+      - auth
+  /user/email/{email}:
     get:
       consumes:
       - application/json
@@ -102,10 +137,12 @@ paths:
           schema:
             additionalProperties: true
             type: object
+      security:
+      - JWT: []
       summary: Get user by Email
       tags:
       - users
-  /api/user/{id}:
+  /user/id/{id}:
     delete:
       consumes:
       - application/json
@@ -130,6 +167,8 @@ paths:
           schema:
             additionalProperties: true
             type: object
+      security:
+      - JWT: []
       summary: Delete user
       tags:
       - users
@@ -157,6 +196,8 @@ paths:
           schema:
             additionalProperties: true
             type: object
+      security:
+      - JWT: []
       summary: Get user by ID
       tags:
       - users
@@ -189,9 +230,16 @@ paths:
           schema:
             additionalProperties: true
             type: object
+      security:
+      - JWT: []
       summary: Update user
       tags:
       - users
 schemes:
 - http
+securityDefinitions:
+  JWT:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

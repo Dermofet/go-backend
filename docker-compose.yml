@@ -50,12 +50,16 @@ services:
     networks:
       - default
 
-  # swagger-ui:
-  #   image: swaggerapi/swagger-ui
-  #   volumes:
-  #       - ./api/swagger/swagger.json:/usr/share/nginx/html/docs/doc.json
-  #   networks:
-  #     - default
+  pgadmin:
+    container_name: pgadmin4
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: root
+    ports:
+      - "5050:80"
+    networks:
+      - default
 
 networks:
   default:
