@@ -3,6 +3,7 @@ package database
 import (
 	"go-backend/iternal/database/dao"
 	"go-backend/iternal/database/models"
+	"go-backend/iternal/schemas"
 
 	"github.com/google/uuid"
 )
@@ -11,7 +12,7 @@ type DBFacadeInterface interface {
 	CreateUser(user *models.User) error
 	GeUsertByID(id uuid.UUID) (*models.User, error)
 	GetUserByEmail(email string) (*models.User, error)
-	UpdateUser(id uuid.UUID, user *models.User) (*models.User, error)
+	UpdateUser(id uuid.UUID, user *schemas.UserUpdate) (*models.User, error)
 	DeleteUser(id uuid.UUID) error
 }
 
@@ -31,7 +32,7 @@ func (f *DBFacade) GetUserByEmail(email string) (*models.User, error) {
 	return f.UserDao.GetByEmail(email)
 }
 
-func (f *DBFacade) UpdateUser(id uuid.UUID, user *models.User) (*models.User, error) {
+func (f *DBFacade) UpdateUser(id uuid.UUID, user *schemas.UserUpdate) (*models.User, error) {
 	return f.UserDao.Update(id, user)
 }
 

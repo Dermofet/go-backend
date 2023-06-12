@@ -2,8 +2,7 @@ package services
 
 import (
 	facade "go-backend/iternal/database/facade"
-	"go-backend/iternal/database/models"
-	_ "go-backend/iternal/schemas"
+	"go-backend/iternal/schemas"
 	"log"
 	"net/url"
 
@@ -47,7 +46,13 @@ func (s *UserService) GetUserByEmail(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"status": "ok", "message": "User not found", "data": nil})
 	}
 
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{"status": "success", "message": "User has found", "data": user})
+	userInfo := schemas.UserInfo{
+		ID:       user.ID,
+		Email:    user.Email,
+		Username: user.Username,
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"status": "success", "message": "User has found", "data": userInfo})
 }
 
 // GetUserByID gets a user by ID.
@@ -57,7 +62,7 @@ func (s *UserService) GetUserByEmail(c *fiber.Ctx) error {
 // @Tags users
 // @Accept json
 // @Produce json
-// @Param id path int true "User ID"
+// @Param id path string true "User ID"
 // @Success 200 {object} map[string]interface{}
 // @Failure 404 {object} map[string]interface{}
 // @Router /user/id/{id} [get]
@@ -79,7 +84,13 @@ func (s *UserService) GetUserByID(c *fiber.Ctx) error {
 		return c.Status(404).JSON(fiber.Map{"status": "error", "message": "User not found", "data": nil})
 	}
 
-	return c.Status(200).JSON(fiber.Map{"status": "success", "message": "User has found", "data": user})
+	userInfo := schemas.UserInfo{
+		ID:       user.ID,
+		Email:    user.Email,
+		Username: user.Username,
+	}
+
+	return c.Status(200).JSON(fiber.Map{"status": "success", "message": "User has found", "data": userInfo})
 }
 
 // UpdateUser update user.
@@ -89,7 +100,8 @@ func (s *UserService) GetUserByID(c *fiber.Ctx) error {
 // @Tags users
 // @Accept json
 // @Produce json
-// @Param id path int true "User ID"
+// @Param id path string true "User ID"
+// @Param body body schemas.UserUpdate true "Request body"
 // @Success 200 {object} map[string]interface{}
 // @Failure 404 {object} map[string]interface{}
 // @Failure 409 {object} map[string]interface{}
@@ -102,7 +114,7 @@ func (s *UserService) UpdateUser(c *fiber.Ctx) error {
 		return c.Status(409).JSON(fiber.Map{"status": "error", "message": "ID is not valid", "data": err})
 	}
 
-	user := new(models.User)
+	user := new(schemas.UserUpdate)
 
 	err = c.BodyParser(user)
 	if err != nil {
@@ -110,17 +122,23 @@ func (s *UserService) UpdateUser(c *fiber.Ctx) error {
 		return c.Status(409).JSON(fiber.Map{"status": "error", "message": "User's fields are invalid", "data": err})
 	}
 
-	user, err = s.Facade.UpdateUser(id, user)
+	userDB, err := s.Facade.UpdateUser(id, user)
 	if err != nil {
 		log.Print("UserService.UpdateUser error: ", err)
 		return c.Status(409).JSON(fiber.Map{"status": "error", "message": "Could not update user", "data": err})
 	}
 
-	if user.ID == uuid.Nil {
+	if userDB.ID == uuid.Nil {
 		return c.Status(404).JSON(fiber.Map{"status": "error", "message": "User not found", "data": nil})
 	}
 
-	return c.Status(200).JSON(fiber.Map{"status": "success", "message": "User has updated", "data": user})
+	userInfo := schemas.UserInfo{
+		ID:       userDB.ID,
+		Email:    userDB.Email,
+		Username: userDB.Username,
+	}
+
+	return c.Status(200).JSON(fiber.Map{"status": "success", "message": "User has updated", "data": userInfo})
 }
 
 // DeleteUser delete user.
@@ -130,7 +148,7 @@ func (s *UserService) UpdateUser(c *fiber.Ctx) error {
 // @Tags users
 // @Accept json
 // @Produce json
-// @Param id path int true "User ID"
+// @Param id path string true "User ID"
 // @Success 200 {object} map[string]interface{}
 // @Failure 409 {object} map[string]interface{}
 // @Router /user/id/{id} [delete]

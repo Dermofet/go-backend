@@ -208,7 +208,7 @@ const docTemplate = `{
                 "operationId": "get-user-by-id",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "User ID",
                         "name": "id",
                         "in": "path",
@@ -252,11 +252,20 @@ const docTemplate = `{
                 "operationId": "update-user",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "User ID",
                         "name": "id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "description": "Request body",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schemas.UserUpdate"
+                        }
                     }
                 ],
                 "responses": {
@@ -303,7 +312,7 @@ const docTemplate = `{
                 "operationId": "delete-user",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "User ID",
                         "name": "id",
                         "in": "path",
@@ -356,6 +365,17 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "schemas.UserUpdate": {
+            "type": "object",
+            "properties": {
+                "email": {
                     "type": "string"
                 },
                 "username": {

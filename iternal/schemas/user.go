@@ -10,8 +10,7 @@ type (
 	}
 
 	UserUpdate struct {
-		ID       uuid.UUID `json:"id"`
-		Email    string    `json:"email"`
-		Username string    `json:"username"`
+		Email    string `json:"email"`
+		Username string `json:"username"`
 	}
 )

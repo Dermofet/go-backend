@@ -21,6 +21,13 @@ definitions:
       username:
         type: string
     type: object
+  schemas.UserUpdate:
+    properties:
+      email:
+        type: string
+      username:
+        type: string
+    type: object
 info:
   contact:
     email: support@swagger.io
@@ -153,7 +160,7 @@ paths:
         in: path
         name: id
         required: true
-        type: integer
+        type: string
       produces:
       - application/json
       responses:
@@ -182,7 +189,7 @@ paths:
         in: path
         name: id
         required: true
-        type: integer
+        type: string
       produces:
       - application/json
       responses:
@@ -211,7 +218,13 @@ paths:
         in: path
         name: id
         required: true
-        type: integer
+        type: string
+      - description: Request body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.UserUpdate'
       produces:
       - application/json
       responses:

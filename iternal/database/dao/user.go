@@ -3,6 +3,7 @@ package dao
 import (
 	"go-backend/iternal/database"
 	"go-backend/iternal/database/models"
+	"go-backend/iternal/schemas"
 	"log"
 
 	"github.com/google/uuid"
@@ -53,15 +54,24 @@ func (u *UserDAO) GetByEmail(email string) (*models.User, error) {
 	return &user, nil
 }
 
-func (u *UserDAO) Update(id uuid.UUID, user *models.User) (*models.User, error) {
-	result := u.DB.Session.Model(&models.User{}).Where("ID = ?", id).Updates(user)
+func (u *UserDAO) Update(id uuid.UUID, user *schemas.UserUpdate) (*models.User, error) {
+	var userDB models.User
+
+	result := u.DB.Session.Model(&models.User{}).Where("ID = ?", id)
 
 	if result.Error != nil {
 		log.Fatal("error in updating user ", user)
 		return nil, result.Error
 	}
 
-	return user, nil
+	result.First(&userDB)
+
+	userDB.Email = user.Email
+	userDB.Username = user.Username
+
+	result.Save(&userDB)
+
+	return &userDB, nil
 }
 
 func (u *UserDAO) Delete(id uuid.UUID) error {
