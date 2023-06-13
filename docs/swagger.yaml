@@ -5,21 +5,38 @@ definitions:
       access_token:
         type: string
     type: object
+  schemas.Response:
+    properties:
+      data: {}
+      message:
+        type: string
+      status:
+        type: string
+    type: object
   schemas.UserSignIn:
     properties:
       email:
         type: string
       password:
+        minLength: 6
         type: string
+    required:
+    - email
+    - password
     type: object
   schemas.UserSignUp:
     properties:
       email:
         type: string
       password:
+        minLength: 6
         type: string
       username:
         type: string
+    required:
+    - email
+    - password
+    - username
     type: object
   schemas.UserUpdate:
     properties:
@@ -27,6 +44,9 @@ definitions:
         type: string
       username:
         type: string
+    required:
+    - email
+    - username
     type: object
 info:
   contact:
@@ -80,8 +100,7 @@ paths:
         "409":
           description: Conflict
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/schemas.Response'
       summary: Sign in user
       tags:
       - auth
@@ -104,13 +123,15 @@ paths:
         "201":
           description: Created
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/schemas.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/schemas.Response'
         "409":
           description: Conflict
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/schemas.Response'
       summary: Sign up user
       tags:
       - auth

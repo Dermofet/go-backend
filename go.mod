@@ -10,6 +10,12 @@ require (
 )
 
 require (
+	github.com/go-playground/locales v0.14.1 // indirect
+	github.com/go-playground/universal-translator v0.18.1 // indirect
+	github.com/leodido/go-urn v1.2.4 // indirect
+)
+
+require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/go-openapi/jsonpointer v0.19.6 // indirect
 	github.com/go-openapi/jsonreference v0.20.2 // indirect
@@ -33,6 +39,7 @@ require (
 require (
 	github.com/ahmetb/go-linq v3.0.0+incompatible
 	github.com/andybalholm/brotli v1.0.5 // indirect
+	github.com/go-playground/validator v9.31.0+incompatible
 	github.com/gofiber/swagger v0.1.12
 	github.com/google/uuid v1.3.0
 	github.com/jinzhu/inflection v1.0.0 // indirect
